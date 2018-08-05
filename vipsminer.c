@@ -125,9 +125,9 @@ enum algos {
 	ALGO_TRIBUS,      /* Denarius jh/keccak/echo */
 	ALGO_VANILLA,     /* Vanilla (Blake256 8-rounds - double sha256) */
 	ALGO_VELTOR,      /* Skein Shavite Shabal Streebog */
-	ALGO_VIPSTAR,     /* Vipstarcoin */
+	ALGO_VIPSTAR,     /* VIPSTARCOIN */
 #ifdef USE_OPENCL
-	ALGO_VIPSTAR_CL,  /* Vipstarcoin with opencl */
+	ALGO_VIPSTAR_CL,  /* ViIPSTARCOIN with opencl */
 #endif
 	ALGO_X11EVO,      /* Permuted X11 */
 	ALGO_X11,         /* X11 */
@@ -361,10 +361,10 @@ Options:\n\
                           s3           S3\n\
                           timetravel   Timetravel (Machinecoin)\n\
                           vanilla      Blake-256 8-rounds\n\
-                          vipstar      Vipstarcoin\n"
+                          vipstar      VIPSTARCOIN\n"
 #ifdef USE_OPENCL
 "\
-                          vipstarcl    Vipstarcoin with OpenCL\n"
+                          vipstarcl    VIPSTARCOIN with OpenCL\n"
 #endif
 "\
                           x11evo       Permuted x11\n\
@@ -1096,9 +1096,9 @@ out:
 	return rc;
 }
 
-#define YES "yes!"
-#define YAY "yay!!!"
-#define BOO "booooo"
+#define YES "horetao!!!"
+#define YAY "horeteruo!!!"
+#define BOO "horenakattao..."
 
 static int share_result(int result, struct work *work, const char *reason)
 {
@@ -1884,7 +1884,29 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 			for (i = 0; i < 8; i++) // prevhash
 				work->data[12+i] = ((uint32_t*)merkle_root)[i];
 			//applog_hex(&work->data[0], 80);
-		} else {
+		}else if (opt_algo == ALGO_VIPSTAR || opt_algo == ALGO_VIPSTAR_CL) {
+		for (i = 0; i < 8; i++)
+			work->data[9 + i] = be32dec((uint32_t *)merkle_root + i);
+		work->data[17] = le32dec(sctx->job.ntime);
+		work->data[18] = le32dec(sctx->job.nbits);
+		for (i = 0; i < 8; i++)
+			work->data[20 + i] = le32dec((uint32_t *)sctx->job.hashstateroot + i);
+		for (i = 0; i < 8; i++)
+			work->data[28 + i] = le32dec((uint32_t *)sctx->job.hashutxoroot + i);
+		work->data[36] = 0x00000000;
+		work->data[37] = 0x00000000;
+		work->data[38] = 0x00000000;
+		work->data[39] = 0x00000000;
+		work->data[40] = 0x00000000;
+		work->data[41] = 0x00000000;
+		work->data[42] = 0x00000000;
+		work->data[43] = 0x00000000;
+		work->data[44] = 0xffffffff;
+		work->data[45] = 0x00000000;
+		work->data[46] = 0x00000000;
+		work->data[47] = 0x00000000;
+		if (opt_debug) applog_hex(work->data, 181);
+         	} else {
 			work->data[17] = le32dec(sctx->job.ntime);
 			work->data[18] = le32dec(sctx->job.nbits);
 			// required ?
@@ -1937,6 +1959,10 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 			case ALGO_LYRA2:
 				work_set_target(work, sctx->job.diff / (128.0 * opt_diff_factor));
 				break;
+			case ALGO_VIPSTAR:
+			#ifdef USE_OPENCL
+			case ALGO_VIPSTAR_CL:
+			#endif
 			default:
 				work_set_target(work, sctx->job.diff / opt_diff_factor);
 		}
