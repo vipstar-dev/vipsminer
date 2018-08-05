@@ -1884,7 +1884,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 			for (i = 0; i < 8; i++) // prevhash
 				work->data[12+i] = ((uint32_t*)merkle_root)[i];
 			//applog_hex(&work->data[0], 80);
-		}else if (opt_algo == ALGO_VIPSTAR || opt_algo == ALGO_VIPSTAR_CL) {
+		} else if (opt_algo == ALGO_VIPSTAR) {
 		for (i = 0; i < 8; i++)
 			work->data[9 + i] = be32dec((uint32_t *)merkle_root + i);
 		work->data[17] = le32dec(sctx->job.ntime);
@@ -1906,7 +1906,33 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 		work->data[46] = 0x00000000;
 		work->data[47] = 0x00000000;
 		if (opt_debug) applog_hex(work->data, 181);
-         	} else {
+         	}
+		#ifdef USE_OPENCL
+		else if (opt_algo == ALGO_VIPSTAR_CL) {
+		for (i = 0; i < 8; i++)
+			work->data[9 + i] = be32dec((uint32_t *)merkle_root + i);
+		work->data[17] = le32dec(sctx->job.ntime);
+		work->data[18] = le32dec(sctx->job.nbits);
+		for (i = 0; i < 8; i++)
+			work->data[20 + i] = le32dec((uint32_t *)sctx->job.hashstateroot + i);
+		for (i = 0; i < 8; i++)
+			work->data[28 + i] = le32dec((uint32_t *)sctx->job.hashutxoroot + i);
+		work->data[36] = 0x00000000;
+		work->data[37] = 0x00000000;
+		work->data[38] = 0x00000000;
+		work->data[39] = 0x00000000;
+		work->data[40] = 0x00000000;
+		work->data[41] = 0x00000000;
+		work->data[42] = 0x00000000;
+		work->data[43] = 0x00000000;
+		work->data[44] = 0xffffffff;
+		work->data[45] = 0x00000000;
+		work->data[46] = 0x00000000;
+		work->data[47] = 0x00000000;
+		if (opt_debug) applog_hex(work->data, 181);
+         	}
+		#endif
+		else {
 			work->data[17] = le32dec(sctx->job.ntime);
 			work->data[18] = le32dec(sctx->job.nbits);
 			// required ?
@@ -1959,10 +1985,6 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 			case ALGO_LYRA2:
 				work_set_target(work, sctx->job.diff / (128.0 * opt_diff_factor));
 				break;
-			case ALGO_VIPSTAR:
-			#ifdef USE_OPENCL
-			case ALGO_VIPSTAR_CL:
-			#endif
 			default:
 				work_set_target(work, sctx->job.diff / opt_diff_factor);
 		}
