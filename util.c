@@ -1681,8 +1681,7 @@ static uint32_t getblocheight(struct stratum_ctx *sctx)
 
 static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 {
-	const char *job_id, *prevhash, *coinb1, *coinb2, *version, *nbits, *ntime;
-	const char *hashstateroot, *hashutxoroot;
+	const char *job_id, *prevhash, *coinb1, *coinb2, *version, *nbits, *ntime, *hashstateroot, *hashutxoroot;
 	const char *claim = NULL;
 	size_t coinb1_size, coinb2_size;
 	bool clean, ret = false;
@@ -1713,7 +1712,7 @@ static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 	hashutxoroot = json_string_value(json_array_get(params, p++));
 	clean = json_is_true(json_array_get(params, p));
 
-	if (!job_id || !prevhash || !coinb1 || !coinb2 || !version || !nbits || !ntime ||
+	if (!job_id || !prevhash || !coinb1 || !coinb2 || !version || !nbits || !ntime || !utxroot || !stateroot ||
 	    strlen(prevhash) != 64 || strlen(version) != 8 ||
 	    strlen(nbits) != 8 || strlen(ntime) != 8) {
 		applog(LOG_ERR, "Stratum notify: invalid parameters");
