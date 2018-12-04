@@ -244,6 +244,7 @@
     <ClCompile Include="algo\timetravel.c" />
     <ClCompile Include="algo\tribus.c" />
     <ClCompile Include="algo\veltor.c" />
+    <ClCompile Include="algo\vipstar.c" />
     <ClCompile Include="algo\x11evo.c" />
     <ClCompile Include="algo\x11.c" />
     <ClCompile Include="algo\x12.c" />
@@ -355,6 +356,7 @@
     <ClInclude Include="sha3\sph_hamsi.h" />
     <ClInclude Include="sha3\sph_types.h" />
     <ClInclude Include="sha3\sph_whirlpool.h" />
+    <ClInclude Include="vipstar\sha2.h" />
     <ClInclude Include="yescrypt\sha256_Y.h" />
     <ClInclude Include="yescrypt\sysendian.h" />
     <ClInclude Include="yescrypt\yescrypt-platform.h" />
