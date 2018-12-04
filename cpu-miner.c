@@ -1795,6 +1795,17 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 			for (i = 0; i < 8; i++) // prevhash
 				work->data[12+i] = ((uint32_t*)merkle_root)[i];
 			//applog_hex(&work->data[0], 80);
+		} else if (opt_algo == ALGO_VIPSTAR) {
+			for (i = 0; i < 8; i++)
+				work->data[9 + i] = be32dec((uint32_t *)merkle_root + i);
+			work->data[17] = le32dec(sctx->job.ntime);
+			work->data[18] = le32dec(sctx->job.nbits);
+			for (i = 0; i < 8; i++)
+				work->data[20 + i] = le32dec((uint32_t *)sctx->job.hashstateroot + i);
+			for (i = 0; i < 8; i++)
+				work->data[28 + i] = le32dec((uint32_t *)sctx->job.hashutxoroot + i);
+			work->data[44] = 0xffffffff;
+		if (opt_debug) applog_hex(work->data, 181);
 		} else {
 			work->data[17] = le32dec(sctx->job.ntime);
 			work->data[18] = le32dec(sctx->job.nbits);
